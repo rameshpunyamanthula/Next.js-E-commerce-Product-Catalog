@@ -1,40 +1,295 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/pages/api-reference/create-next-app).
+🛒 My E-Commerce Product Catalog
 
-## Getting Started
+Next.js + Redux Toolkit + Docker
 
-First, run the development server:
+📌 Project Overview
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+This project is a multi-page e-commerce product catalog built using Next.js with Server-Side Rendering (SSR) and Redux Toolkit for global state management.
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+The goal of this project is to demonstrate how a modern e-commerce application can be built with:
 
-You can start editing the page by modifying `pages/index.js`. The page auto-updates as you edit the file.
+Fast, SEO-friendly server-rendered pages
 
-[API routes](https://nextjs.org/docs/pages/building-your-application/routing/api-routes) can be accessed on [http://localhost:3000/api/hello](http://localhost:3000/api/hello). This endpoint can be edited in `pages/api/hello.js`.
+URL-driven filtering and pagination
 
-The `pages/api` directory is mapped to `/api/*`. Files in this directory are treated as [API routes](https://nextjs.org/docs/pages/building-your-application/routing/api-routes) instead of React pages.
+Centralized state management for cart and wishlist
 
-This project uses [`next/font`](https://nextjs.org/docs/pages/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Dockerized setup for one-command execution
 
-## Learn More
+Verifiable behaviors for automated evaluation
 
-To learn more about Next.js, take a look at the following resources:
+The application uses FakeStoreAPI as a mock backend to simulate real-world product data.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn-pages-router) - an interactive Next.js tutorial.
+🧠 What We Implemented (High-Level)
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+This project covers all core requirements provided in the task:
 
-## Deploy on Vercel
+Server-side rendered product listing
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+Pagination and category filtering using URL query params
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/pages/building-your-application/deploying) for more details.
+Debounced product search
+
+Product detail pages with SEO meta tags
+
+Shopping cart with quantity update & removal
+
+Wishlist functionality
+
+Toast notifications for user actions
+
+Redux state exposure for automated verification
+
+Docker + Docker Compose with health checks
+
+🛠️ Technology Stack
+Area	Technology
+Framework	Next.js
+Rendering	Server-Side Rendering (getServerSideProps)
+State Management	Redux Toolkit
+Notifications	React Toastify
+API	FakeStoreAPI
+Containerization	Docker & Docker Compose
+📂 Project Structure (Important for Evaluators)
+my-ecommerce-app/
+├── Dockerfile
+├── docker-compose.yml
+├── .env.example
+├── package.json
+├── pages/
+│   ├── _app.js                # Redux Provider + global utilities
+│   ├── index.js               # Home page
+│   ├── cart.js                # Cart page (steps 9 & 10)
+│   ├── products/
+│   │   ├── index.js           # Product listing (SSR, pagination, search)
+│   │   └── [id].js            # Product detail page
+│   └── api/
+│       └── health.js          # Health check endpoint
+├── store/
+│   ├── index.js               # Redux store
+│   ├── cartSlice.js           # Cart logic
+│   └── wishlistSlice.js       # Wishlist logic
+├── utils/
+│   └── toastStore.js          # Toast verification helper
+└── README.md
+
+🔧 Environment Variables
+
+An example environment file is provided as required.
+
+File: .env.example
+
+NEXT_PUBLIC_API_URL=https://fakestoreapi.com
+PORT=3000
+
+
+This ensures no secrets are committed to the repository.
+
+🐳 Docker & One-Command Setup (Core Requirement)
+What We Did
+
+Created a Dockerfile to build the Next.js app
+
+Created docker-compose.yml with:
+
+app service
+
+Port mapping (3000:3000)
+
+Health check using /api/health
+
+▶️ How to Run the Application
+docker-compose up --build -d
+
+✅ How Evaluators Can Verify Docker Setup
+
+Check container status
+
+docker-compose ps
+
+
+Expected:
+
+Up (healthy)
+
+
+Check health endpoint
+
+curl http://localhost:3000/api/health
+
+
+Expected:
+
+200 OK
+
+
+Check home page
+
+curl http://localhost:3000
+
+
+Expected:
+
+200 OK HTML response
+
+🧾 Product Listing Page (/products) – SSR
+What We Did
+
+Used getServerSideProps to fetch products on the server
+
+Returned fully rendered HTML
+
+Ensured products are visible even without JavaScript
+
+Added required test IDs
+
+How to Verify
+curl http://localhost:3000/products
+
+
+Check HTML contains:
+
+data-testid="product-item"
+
+📄 Pagination (Server-Side)
+What We Did
+
+Displayed 10 products per page
+
+Used page query parameter
+
+Paginated server-side after fetching data
+
+URLs
+/products
+/products?page=2
+
+Verification
+
+First product on page 1 ≠ first product on page 2
+
+Pagination buttons exist:
+
+data-testid="pagination-prev"
+
+data-testid="pagination-next"
+
+🏷 Category Filtering
+What We Did
+
+Supported category filtering using URL params
+
+Example:
+
+/products?category=electronics
+
+
+Added filter button:
+
+data-testid="category-filter-electronics"
+
+🔍 Debounced Search (Step 6)
+What We Did
+
+Added search input with debounce (≥300ms)
+
+Prevented excessive re-renders
+
+Exposed verification function
+
+Input Element
+data-testid="search-input"
+
+Verification Function
+window.getDebounceStatus()
+
+
+Returns:
+
+{
+  lastSearchTerm: "computer",
+  searchCount: 1
+}
+
+📦 Product Detail Page (/products/[id])
+What We Did
+
+Server-side fetched single product
+
+Displayed:
+
+Title
+
+Price
+
+Description
+
+Image
+
+Test IDs
+
+product-title
+
+product-price
+
+product-description
+
+🛒 Cart Functionality (Steps 8, 9, 10)
+Add to Cart
+
+Button:
+
+data-testid="add-to-cart-button"
+
+Update Quantity
+
+Input:
+
+data-testid="cart-item-quantity-input-<id>"
+
+
+Button:
+
+data-testid="cart-item-quantity-update-<id>"
+
+Remove Item
+data-testid="cart-item-remove-button-<id>"
+
+Verification Helper
+window.getCartState()
+
+❤️ Wishlist (Step 11)
+
+Toggle wishlist on product page
+
+Button:
+
+data-testid="add-to-wishlist-button"
+
+
+Verification:
+
+window.getWishlistState()
+
+🔔 Toast Notifications (Step 12)
+What We Did
+
+Show toast when product is added to cart
+
+Stored last toast message for verification
+
+Verification
+window.getLastToastMessage()
+
+
+Expected:
+
+Item added to cart!
+
+🔍 SEO Meta Tags (Step 13)
+
+Dynamic <title> and <meta description>
+
+Based on product data
+
+Implemented in /products/[id]
